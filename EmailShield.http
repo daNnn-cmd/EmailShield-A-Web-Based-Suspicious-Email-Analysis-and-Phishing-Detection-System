@@ -1,0 +1,6 @@
+@EmailShield_HostAddress = http://localhost:5032
+
+GET {{EmailShield_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

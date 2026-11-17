@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmailShield — Analysis Rules & Settings</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/jpeg" href="../images/logo.jpg">
+  <script src="../js/auth.js"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- ADMINISTRATOR SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="../images/logo.jpg" alt="EmailShield Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <h1>EmailShield</h1>
+          <p>Security Hub</p>
+        </div>
+      </div>
+
+      <div class="sidebar-nav-title">Administration</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <a href="/admin/index.html" class="sidebar-link">
+            <span class="icon">📊</span>
+            <span>Admin Dashboard</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/users.html" class="sidebar-link">
+            <span class="icon">👥</span>
+            <span>User Accounts</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/audits.html" class="sidebar-link">
+            <span class="icon">📝</span>
+            <span>Security Audit Logs</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/scans.html" class="sidebar-link">
+            <span class="icon">🗄️</span>
+            <span>Global Scan Archive</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/settings.html" class="sidebar-link active">
+            <span class="icon">⚙️</span>
+            <span>Rules & Settings</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-secondary" style="width: 100%; gap: 10px;" onclick="confirmSignOut()">
+          <span>🚪</span> Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <header class="top-bar">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700;">System Settings & Analysis Rules</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Configure detection thresholds, penalty weightings, and threat intelligence parameters</p>
+        </div>
+        <div class="user-badge">
+          <span id="navUserName">Admin</span>
+          <span id="navUserRole" class="role-tag role-admin">ADMINISTRATOR</span>
+        </div>
+      </header>
+
+      <div class="container" style="padding-top: 1.5rem; max-width: 1000px;">
+        <div id="globalAlert" class="alert" style="display: none;"></div>
+
+        <form id="formSettings" onsubmit="saveSystemSettings(event)">
+          <!-- Risk Classification Thresholds -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-title">
+              <span>🎯 Risk Classification Thresholds</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+              Set the numerical scoring boundaries used to categorize analyzed emails into Low, Medium, and High risk classifications.
+            </p>
+            <div class="grid grid-cols-2" style="gap: 1.25rem;">
+              <div class="form-group">
+                <label for="cfgHighThreshold">High Risk Threshold (Score ≥ N)</label>
+                <input type="number" id="cfgHighThreshold" class="form-control" min="50" max="95" required>
+                <small style="color: var(--text-muted); font-size: 0.75rem;">Emails scoring at or above this value are classified as <strong>High Risk</strong>.</small>
+              </div>
+              <div class="form-group">
+                <label for="cfgMedThreshold">Medium Risk Threshold (Score ≥ N)</label>
+                <input type="number" id="cfgMedThreshold" class="form-control" min="20" max="65" required>
+                <small style="color: var(--text-muted); font-size: 0.75rem;">Emails scoring below High but at or above this value are <strong>Medium Risk</strong>.</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Analysis Rules & Modules -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-title">
+              <span>🛡️ Detection Modules & Analysis Rules</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+              Enable or disable specific forensic inspection modules across all incoming email scans.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="chkSpoofing" style="width: 18px; height: 18px; accent-color: var(--accent);">
+                <span><strong>Sender and Domain Spoofing Analysis:</strong> Detect Reply-To address mismatches, display name impersonation, and sender spoofing.</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="chkUrls" style="width: 18px; height: 18px; accent-color: var(--accent);">
+                <span><strong>Suspicious URL Detection:</strong> Inspect embedded links for misleading domains, raw IP hosts, deceptive redirects, and phishing keywords.</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="chkAttachments" style="width: 18px; height: 18px; accent-color: var(--accent);">
+                <span><strong>Attachment Metadata Analysis:</strong> Examine filenames, double extensions, MIME types, and macro-enabled Office payloads.</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="chkAuth" style="width: 18px; height: 18px; accent-color: var(--accent);">
+                <span><strong>Email Authentication Verification:</strong> Evaluate SPF, DKIM, and DMARC alignments from supplied email headers.</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="chkBec" style="width: 18px; height: 18px; accent-color: var(--accent);">
+                <span><strong>Phishing & BEC Heuristics:</strong> Identify coercive urgency, credential harvesting attempts, and fraudulent wire transfer instructions.</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Threat Scoring Penalty Weights -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-title">
+              <span>⚖️ Penalty Point Weightings</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+              Configure the risk points added to the total threat score (0-100) when specific warning signs are identified.
+            </p>
+            <div class="grid grid-cols-2" style="gap: 1.25rem;">
+              <div class="form-group">
+                <label for="ptsSpf">SPF Authentication Failure (pts)</label>
+                <input type="number" id="ptsSpf" class="form-control" min="5" max="50" required>
+              </div>
+              <div class="form-group">
+                <label for="ptsDkim">DKIM Signature Failure (pts)</label>
+                <input type="number" id="ptsDkim" class="form-control" min="5" max="50" required>
+              </div>
+              <div class="form-group">
+                <label for="ptsDmarc">DMARC Policy Rejection (pts)</label>
+                <input type="number" id="ptsDmarc" class="form-control" min="5" max="50" required>
+              </div>
+              <div class="form-group">
+                <label for="ptsReplyTo">Reply-To Address Mismatch (pts)</label>
+                <input type="number" id="ptsReplyTo" class="form-control" min="5" max="50" required>
+              </div>
+              <div class="form-group">
+                <label for="ptsDispName">Display Name Impersonation (pts)</label>
+                <input type="number" id="ptsDispName" class="form-control" min="5" max="50" required>
+              </div>
+              <div class="form-group">
+                <label for="ptsDoubleExt">Deceptive Double Extension (pts)</label>
+                <input type="number" id="ptsDoubleExt" class="form-control" min="5" max="50" required>
+              </div>
+              <div class="form-group">
+                <label for="ptsExecAtt">High-Risk Executable Attachment (pts)</label>
+                <input type="number" id="ptsExecAtt" class="form-control" min="5" max="50" required>
+              </div>
+              <div class="form-group">
+                <label for="ptsMacro">Macro-Enabled Office Document (pts)</label>
+                <input type="number" id="ptsMacro" class="form-control" min="5" max="50" required>
+              </div>
+              <div class="form-group">
+                <label for="ptsBec">BEC / Wire Fraud Payment Instruction (pts)</label>
+                <input type="number" id="ptsBec" class="form-control" min="5" max="50" required>
+              </div>
+              <div class="form-group">
+                <label for="ptsUrgency">Urgent Coercive Language (pts)</label>
+                <input type="number" id="ptsUrgency" class="form-control" min="5" max="50" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Threat Intelligence Settings -->
+          <div class="card" style="margin-bottom: 2rem;">
+            <div class="card-title">
+              <span>🌐 Threat Intelligence & Policy Settings</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+              Manage available external threat intelligence feeds, high-abuse TLD monitoring, and automated incident containment policies.
+            </p>
+            <div style="margin-bottom: 1.25rem;">
+              <label style="display: block; font-weight: 600; margin-bottom: 8px;">Active Threat Intelligence Feeds</label>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem;">
+                  <input type="checkbox" id="chkFeedOpenPhish" style="accent-color: var(--accent);"> OpenPhish Feed
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem;">
+                  <input type="checkbox" id="chkFeedVirusTotal" style="accent-color: var(--accent);"> VirusTotal Intelligence
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem;">
+                  <input type="checkbox" id="chkFeedAbuseIpdb" style="accent-color: var(--accent);"> AbuseIPDB Blacklist
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem;">
+                  <input type="checkbox" id="chkFeedUrlHaus" style="accent-color: var(--accent);"> URLHaus Malware Feed
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem;">
+                  <input type="checkbox" id="chkFeedSpamhaus" style="accent-color: var(--accent);"> Spamhaus ZEN
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="cfgMonitoredTlds">Monitored High-Abuse Top-Level Domains (TLDs)</label>
+              <textarea id="cfgMonitoredTlds" class="form-control" rows="2" placeholder=".xyz, .top, .work, .click..."></textarea>
+              <small style="color: var(--text-muted); font-size: 0.75rem;">Comma-separated list of top-level domains automatically flagged for elevated scrutiny.</small>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 1rem;">
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="chkAutoQuarantine" style="width: 18px; height: 18px; accent-color: var(--accent);">
+                <span><strong>Automated Quarantine:</strong> Automatically flag high-risk emails for perimeter containment and administrative review.</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="chkAlertBec" style="width: 18px; height: 18px; accent-color: var(--accent);">
+                <span><strong>Incident Notification:</strong> Trigger priority alerts for Security Analysts when Business Email Compromise (BEC) is flagged.</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div style="display: flex; gap: 12px; justify-content: flex-end; margin-bottom: 2rem;">
+            <button type="button" class="btn btn-secondary" onclick="openResetSettingsModal()">🔄 Reset to Defaults</button>
+            <button type="submit" class="btn btn-primary" id="btnSaveSettings">💾 Save System Settings & Rules</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Modal: Reset Settings Confirmation -->
+      <div id="modalResetSettings" class="modal-overlay" style="display: none;" onclick="if(event.target===this) closeResetSettingsModal()">
+        <div class="modal-box">
+          <div class="modal-icon" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.3); color: #fbbf24;">⚠️</div>
+          <h3 class="modal-title">Reset Settings to Defaults?</h3>
+          <p class="modal-desc">
+            Are you sure you want to reset all analysis rules, risk thresholds, penalty weights, and threat intelligence options to system default values?
+          </p>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeResetSettingsModal()">Cancel</button>
+            <button type="button" class="btn btn-danger" id="btnConfirmReset" onclick="executeResetSettings()">🔄 Yes, Reset Defaults</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/admin.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const user = requireAuth("Administrator");
+      if (user) {
+        loadSystemSettings();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeResetSettingsModal();
+    });
+
+    function openResetSettingsModal() {
+      const modal = document.getElementById("modalResetSettings");
+      if (modal) modal.style.display = "flex";
+    }
+
+    function closeResetSettingsModal() {
+      const modal = document.getElementById("modalResetSettings");
+      if (modal) modal.style.display = "none";
+    }
+
+    async function executeResetSettings() {
+      const btn = document.getElementById("btnConfirmReset");
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Resetting...";
+      }
+
+      const currentUser = getCurrentUser();
+      const adminParam = currentUser?.userId ? `?adminUserId=${currentUser.userId}` : "";
+
+      try {
+        const res = await fetch(`/api/settings/reset${adminParam}`, { method: "POST" });
+        if (res.ok) {
+          closeResetSettingsModal();
+          showAlert("System settings restored to defaults successfully.", "success");
+          loadSystemSettings();
+        } else {
+          const data = await res.json().catch(() => ({}));
+          showAlert(data.message || "Failed to reset settings.", "danger");
+        }
+      } catch {
+        showAlert("Network error while resetting settings.", "danger");
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "🔄 Yes, Reset Defaults";
+        }
+      }
+    }
+
+    async function loadSystemSettings() {
+      try {
+        const res = await fetch("/api/settings");
+        if (!res.ok) throw new Error();
+        const cfg = await res.json();
+
+        // Thresholds
+        document.getElementById("cfgHighThreshold").value = cfg.riskThresholds.highRiskThreshold;
+        document.getElementById("cfgMedThreshold").value = cfg.riskThresholds.mediumRiskThreshold;
+
+        // Modules
+        document.getElementById("chkSpoofing").checked = cfg.ruleToggles.enableSpoofingDetection;
+        document.getElementById("chkUrls").checked = cfg.ruleToggles.enableUrlAnalysis;
+        document.getElementById("chkAttachments").checked = cfg.ruleToggles.enableAttachmentInspection;
+        document.getElementById("chkAuth").checked = cfg.ruleToggles.enableAuthVerification;
+        document.getElementById("chkBec").checked = cfg.ruleToggles.enableBecDetection;
+
+        // Points
+        document.getElementById("ptsSpf").value = cfg.ruleWeightings.spfFailPoints;
+        document.getElementById("ptsDkim").value = cfg.ruleWeightings.dkimFailPoints;
+        document.getElementById("ptsDmarc").value = cfg.ruleWeightings.dmarcFailPoints;
+        document.getElementById("ptsReplyTo").value = cfg.ruleWeightings.replyToMismatchPoints;
+        document.getElementById("ptsDispName").value = cfg.ruleWeightings.displayNameImpersonationPoints;
+        document.getElementById("ptsDoubleExt").value = cfg.ruleWeightings.doubleExtensionPoints;
+        document.getElementById("ptsExecAtt").value = cfg.ruleWeightings.dangerousAttachmentPoints;
+        document.getElementById("ptsMacro").value = cfg.ruleWeightings.macroDocumentPoints;
+        document.getElementById("ptsBec").value = cfg.ruleWeightings.becWireFraudPoints;
+        document.getElementById("ptsUrgency").value = cfg.ruleWeightings.urgencyLanguagePoints;
+
+        // Threat Intel
+        document.getElementById("chkFeedOpenPhish").checked = cfg.threatIntel.enableOpenPhish;
+        document.getElementById("chkFeedVirusTotal").checked = cfg.threatIntel.enableVirusTotal;
+        document.getElementById("chkFeedAbuseIpdb").checked = cfg.threatIntel.enableAbuseIpdb;
+        document.getElementById("chkFeedUrlHaus").checked = cfg.threatIntel.enableUrlHaus;
+        document.getElementById("chkFeedSpamhaus").checked = cfg.threatIntel.enableSpamhaus;
+        document.getElementById("cfgMonitoredTlds").value = cfg.threatIntel.monitoredTlds;
+        document.getElementById("chkAutoQuarantine").checked = cfg.threatIntel.autoQuarantineHighRisk;
+        document.getElementById("chkAlertBec").checked = cfg.threatIntel.alertSecurityAnalystOnBec;
+      } catch {
+        showAlert("Failed to load system settings from server.", "danger");
+      }
+    }
+
+    async function saveSystemSettings(e) {
+      e.preventDefault();
+      const currentUser = getCurrentUser();
+      const adminParam = currentUser?.userId ? `?adminUserId=${currentUser.userId}` : "";
+
+      const btn = document.getElementById("btnSaveSettings");
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Saving...";
+      }
+
+      const payload = {
+        riskThresholds: {
+          highRiskThreshold: parseInt(document.getElementById("cfgHighThreshold").value),
+          mediumRiskThreshold: parseInt(document.getElementById("cfgMedThreshold").value)
+        },
+        ruleToggles: {
+          enableSpoofingDetection: document.getElementById("chkSpoofing").checked,
+          enableUrlAnalysis: document.getElementById("chkUrls").checked,
+          enableAttachmentInspection: document.getElementById("chkAttachments").checked,
+          enableAuthVerification: document.getElementById("chkAuth").checked,
+          enableBecDetection: document.getElementById("chkBec").checked
+        },
+        ruleWeightings: {
+          spfFailPoints: parseInt(document.getElementById("ptsSpf").value),
+          dkimFailPoints: parseInt(document.getElementById("ptsDkim").value),
+          dmarcFailPoints: parseInt(document.getElementById("ptsDmarc").value),
+          replyToMismatchPoints: parseInt(document.getElementById("ptsReplyTo").value),
+          displayNameImpersonationPoints: parseInt(document.getElementById("ptsDispName").value),
+          doubleExtensionPoints: parseInt(document.getElementById("ptsDoubleExt").value),
+          dangerousAttachmentPoints: parseInt(document.getElementById("ptsExecAtt").value),
+          macroDocumentPoints: parseInt(document.getElementById("ptsMacro").value),
+          becWireFraudPoints: parseInt(document.getElementById("ptsBec").value),
+          urgencyLanguagePoints: parseInt(document.getElementById("ptsUrgency").value)
+        },
+        threatIntel: {
+          enableOpenPhish: document.getElementById("chkFeedOpenPhish").checked,
+          enableVirusTotal: document.getElementById("chkFeedVirusTotal").checked,
+          enableAbuseIpdb: document.getElementById("chkFeedAbuseIpdb").checked,
+          enableUrlHaus: document.getElementById("chkFeedUrlHaus").checked,
+          enableSpamhaus: document.getElementById("chkFeedSpamhaus").checked,
+          monitoredTlds: document.getElementById("cfgMonitoredTlds").value.trim(),
+          autoQuarantineHighRisk: document.getElementById("chkAutoQuarantine").checked,
+          alertSecurityAnalystOnBec: document.getElementById("chkAlertBec").checked
+        }
+      };
+
+      try {
+        const res = await fetch(`/api/settings${adminParam}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          showAlert(data.message || "System settings saved successfully.", "success");
+        } else {
+          showAlert(data.message || "Failed to save settings.", "danger");
+        }
+      } catch {
+        showAlert("Network error while saving settings.", "danger");
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "💾 Save System Settings & Rules";
+        }
+      }
+    }
+  </script>
+</body>
+</html>
+

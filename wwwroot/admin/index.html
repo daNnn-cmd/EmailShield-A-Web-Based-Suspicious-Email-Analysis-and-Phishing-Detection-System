@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmailShield — Admin Dashboard</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/jpeg" href="../images/logo.jpg">
+  <script src="../js/auth.js"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- ADMINISTRATOR SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="../images/logo.jpg" alt="EmailShield Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <h1>EmailShield</h1>
+          <p>Security Hub</p>
+        </div>
+      </div>
+
+      <div class="sidebar-nav-title">Administration</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <a href="/admin/index.html" class="sidebar-link active">
+            <span class="icon">📊</span>
+            <span>Admin Dashboard</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/users.html" class="sidebar-link">
+            <span class="icon">👥</span>
+            <span>User Accounts</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/audits.html" class="sidebar-link">
+            <span class="icon">📝</span>
+            <span>Security Audit Logs</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/scans.html" class="sidebar-link">
+            <span class="icon">🗄️</span>
+            <span>Global Scan Archive</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/settings.html" class="sidebar-link">
+            <span class="icon">⚙️</span>
+            <span>Rules & Settings</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-secondary" style="width: 100%; gap: 10px;" onclick="confirmSignOut()">
+          <span>🚪</span> Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <header class="top-bar">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700;">Admin Dashboard</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">High-level threat metrics and platform statistics</p>
+        </div>
+        <div class="user-badge">
+          <span id="navUserName">Admin</span>
+          <span id="navUserRole" class="role-tag role-admin">ADMINISTRATOR</span>
+        </div>
+      </header>
+
+      <div class="container" style="padding-top: 1.5rem;">
+        <div id="globalAlert" class="alert" style="display: none;"></div>
+
+        <div class="view-header">
+          <h2>Administrator Control Center</h2>
+          <p>System configuration, user account controls, and organization-wide security audit trails.</p>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-4" style="margin-bottom: 2rem;">
+          <div class="card stat-card">
+            <div class="stat-icon" style="background: rgba(2, 132, 199, 0.2); color: #38bdf8;">📊</div>
+            <div class="stat-info">
+              <h3 id="admStatTotalAnalyzed">0</h3>
+              <p>Total Emails Analyzed</p>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon" style="background: var(--danger-bg); color: #f87171;">🚨</div>
+            <div class="stat-info">
+              <h3 id="admStatHighRisk">0</h3>
+              <p>High-Risk Threats</p>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">👥</div>
+            <div class="stat-info">
+              <h3 id="admStatUsers">0</h3>
+              <p>Registered Users</p>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">📝</div>
+            <div class="stat-info">
+              <h3 id="admStatAudits">0</h3>
+              <p>Audit Log Entries</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Users Table -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <div class="card-title">
+            <span>👥 Registered System Users</span>
+            <a href="/admin/users.html" class="btn btn-secondary btn-sm">Manage All Users →</a>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Assigned Role</th>
+                  <th>Status</th>
+                  <th>Registered</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="tableUsersBody">
+                <tr><td colspan="6" style="text-align: center;">Loading users...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Quick Audits Table -->
+        <div class="card">
+          <div class="card-title">
+            <span>📝 Recent Audit Logs</span>
+            <a href="/admin/audits.html" class="btn btn-secondary btn-sm">View Full Audit Trail →</a>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Action</th>
+                  <th>Description</th>
+                  <th>Timestamp (Philippine Time)</th>
+                </tr>
+              </thead>
+              <tbody id="tableAuditsBody">
+                <tr><td colspan="4" style="text-align: center;">Loading audit logs...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/admin.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const user = requireAuth("Administrator");
+      if (user) {
+        loadAdminSummary();
+        loadAdminUsers();
+        loadAuditLogs();
+      }
+    });
+  </script>
+</body>
+</html>
+

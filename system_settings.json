@@ -1,0 +1,35 @@
+{
+  "RiskThresholds": {
+    "HighRiskThreshold": 70,
+    "MediumRiskThreshold": 40
+  },
+  "RuleToggles": {
+    "EnableSpoofingDetection": true,
+    "EnableUrlAnalysis": true,
+    "EnableAttachmentInspection": true,
+    "EnableAuthVerification": true,
+    "EnableBecDetection": true
+  },
+  "RuleWeightings": {
+    "SpfFailPoints": 25,
+    "DkimFailPoints": 20,
+    "DmarcFailPoints": 25,
+    "ReplyToMismatchPoints": 25,
+    "DisplayNameImpersonationPoints": 30,
+    "DangerousAttachmentPoints": 30,
+    "DoubleExtensionPoints": 35,
+    "MacroDocumentPoints": 20,
+    "BecWireFraudPoints": 30,
+    "UrgencyLanguagePoints": 15
+  },
+  "ThreatIntel": {
+    "EnableOpenPhish": true,
+    "EnableVirusTotal": true,
+    "EnableAbuseIpdb": true,
+    "EnableUrlHaus": true,
+    "EnableSpamhaus": true,
+    "MonitoredTlds": ".xyz, .top, .work, .click, .buzz, .country, .tk, .ml, .ga, .cf, .gq, .site, .online",
+    "AutoQuarantineHighRisk": true,
+    "AlertSecurityAnalystOnBec": true
+  }
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmailShield — Analysis History</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/jpeg" href="../images/logo.jpg">
+  <script src="../js/auth.js"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- SECURITY ANALYST SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="../images/logo.jpg" alt="EmailShield Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <h1>EmailShield</h1>
+          <p>Security Hub</p>
+        </div>
+      </div>
+
+      <div class="sidebar-nav-title">Threat Intelligence</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <a href="/analyst/index.html" class="sidebar-link">
+            <span class="icon">🔍</span>
+            <span>Submit & Analyze</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/analyst/report.html" class="sidebar-link">
+            <span class="icon">🔬</span>
+            <span>Forensics Findings</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/analyst/history.html" class="sidebar-link active">
+            <span class="icon">📜</span>
+            <span>Analysis History</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-secondary" style="width: 100%; gap: 10px;" onclick="confirmSignOut()">
+          <span>🚪</span> Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <header class="top-bar">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700;">Forensic Inspection History</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Historical records of previous threat investigations</p>
+        </div>
+        <div class="user-badge">
+          <span id="navUserName">Analyst</span>
+          <span id="navUserRole" class="role-tag role-analyst">SECURITY ANALYST</span>
+        </div>
+      </header>
+
+      <div class="container" style="padding-top: 1.5rem;">
+        <div id="globalAlert" class="alert" style="display: none;"></div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>📜 Previous Investigations</span>
+            <button class="btn btn-secondary btn-sm" onclick="loadAnalystHistory()">🔄 Refresh History</button>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Email Subject</th>
+                  <th>Sender</th>
+                  <th>Submitted By</th>
+                  <th>Risk Score</th>
+                  <th>Classification</th>
+                  <th>Analyzed Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="tableAnalystHistoryBody">
+                <tr><td colspan="7" style="text-align: center;">Loading history...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div class="pagination-bar" id="analystPagination" style="display: flex; align-items: center; justify-content: space-between; margin-top: 1.25rem; flex-wrap: wrap; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <div style="font-size: 0.85rem; color: var(--text-muted);" id="analystPaginationInfo">
+              Showing 0 to 0 of 0 records
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label for="analystPageSize" style="font-size: 0.85rem; color: var(--text-muted);">Rows per page:</label>
+              <select id="analystPageSize" class="form-control" style="width: auto; padding: 4px 10px; font-size: 0.85rem; height: auto;" onchange="changeAnalystPageSize(this.value)">
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+              <button id="btnAnalystPrev" class="btn btn-secondary btn-sm" onclick="prevAnalystPage()" disabled>Previous</button>
+              <span id="analystPageNumber" style="font-size: 0.85rem; font-weight: 600; padding: 0 6px;">Page 1 of 1</span>
+              <button id="btnAnalystNext" class="btn btn-secondary btn-sm" onclick="nextAnalystPage()" disabled>Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/analyst.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const user = requireAuth("Security Analyst");
+      if (user) {
+        loadAnalystHistory();
+      }
+    });
+  </script>
+</body>
+</html>
+

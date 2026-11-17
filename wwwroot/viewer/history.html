@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmailShield — My Submissions</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/jpeg" href="../images/logo.jpg">
+  <script src="../js/auth.js"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- VIEWER SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="../images/logo.jpg" alt="EmailShield Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <h1>EmailShield</h1>
+          <p>Security Hub</p>
+        </div>
+      </div>
+
+      <div class="sidebar-nav-title">Email Security</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <a href="/viewer/index.html" class="sidebar-link">
+            <span class="icon">🛡️</span>
+            <span>Check Suspicious Email</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/viewer/history.html" class="sidebar-link active">
+            <span class="icon">📋</span>
+            <span>My Past Submissions</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/viewer/tips.html" class="sidebar-link">
+            <span class="icon">💡</span>
+            <span>Phishing Red Flags</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-secondary" style="width: 100%; gap: 10px;" onclick="confirmSignOut()">
+          <span>🚪</span> Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <header class="top-bar">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700;">My Submission History</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Historical verification results for emails you submitted</p>
+        </div>
+        <div class="user-badge">
+          <span id="navUserName">User</span>
+          <span id="navUserRole" class="role-tag role-viewer">VIEWER / USER</span>
+        </div>
+      </header>
+
+      <div class="container" style="padding-top: 1.5rem;">
+        <div id="globalAlert" class="alert" style="display: none;"></div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>📋 Personal Email Submission Archive</span>
+            <button class="btn btn-secondary btn-sm" onclick="loadViewerHistory()">🔄 Refresh History</button>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Subject</th>
+                  <th>Sender</th>
+                  <th>Assigned Risk Level</th>
+                  <th>Date Checked</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="tableViewerHistoryBody">
+                <tr><td colspan="5" style="text-align: center;">Loading your submissions...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div class="pagination-bar" id="viewerPagination" style="display: flex; align-items: center; justify-content: space-between; margin-top: 1.25rem; flex-wrap: wrap; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <div style="font-size: 0.85rem; color: var(--text-muted);" id="viewerPaginationInfo">
+              Showing 0 to 0 of 0 submissions
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label for="viewerPageSize" style="font-size: 0.85rem; color: var(--text-muted);">Rows per page:</label>
+              <select id="viewerPageSize" class="form-control" style="width: auto; padding: 4px 10px; font-size: 0.85rem; height: auto;" onchange="changeViewerPageSize(this.value)">
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+              <button id="btnViewerPrev" class="btn btn-secondary btn-sm" onclick="prevViewerPage()" disabled>Previous</button>
+              <span id="viewerPageNumber" style="font-size: 0.85rem; font-weight: 600; padding: 0 6px;">Page 1 of 1</span>
+              <button id="btnViewerNext" class="btn btn-secondary btn-sm" onclick="nextViewerPage()" disabled>Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/viewer.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const user = requireAuth("Viewer");
+      if (user) {
+        loadViewerHistory();
+      }
+    });
+  </script>
+</body>
+</html>
+

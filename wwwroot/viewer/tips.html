@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmailShield — Phishing Red Flags</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/jpeg" href="../images/logo.jpg">
+  <script src="../js/auth.js"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- VIEWER SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="../images/logo.jpg" alt="EmailShield Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <h1>EmailShield</h1>
+          <p>Security Hub</p>
+        </div>
+      </div>
+
+      <div class="sidebar-nav-title">Email Security</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <a href="/viewer/index.html" class="sidebar-link">
+            <span class="icon">🛡️</span>
+            <span>Check Suspicious Email</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/viewer/history.html" class="sidebar-link">
+            <span class="icon">📋</span>
+            <span>My Past Submissions</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/viewer/tips.html" class="sidebar-link active">
+            <span class="icon">💡</span>
+            <span>Phishing Red Flags</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-secondary" style="width: 100%; gap: 10px;" onclick="confirmSignOut()">
+          <span>🚪</span> Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <header class="top-bar">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700;">Phishing Awareness & Guidance</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Key indicators and red flags to recognize cyber threats</p>
+        </div>
+        <div class="user-badge">
+          <span id="navUserName">User</span>
+          <span id="navUserRole" class="role-tag role-viewer">VIEWER / USER</span>
+        </div>
+      </header>
+
+      <div class="container" style="padding-top: 1.5rem;">
+        <div id="globalAlert" class="alert" style="display: none;"></div>
+
+        <div class="card" style="margin-bottom: 2rem;">
+          <div class="card-title">
+            <span>💡 What is Business Email Compromise (BEC) & Phishing?</span>
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+            Phishing is a social engineering attack where malicious actors deceive victims into handing over login credentials, sensitive data, or transferring organizational funds. Business Email Compromise (BEC) impersonates trusted executives, colleagues, or vendors to fraudulently redirect wire transfers.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2" style="gap: 1.5rem;">
+          <div class="card" style="border-left: 4px solid var(--danger);">
+            <h4 style="color: #f87171; margin-bottom: 8px;">🚨 1. Artificial Urgency & Coercive Deadlines</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+              Phrases like <em>"Account suspended in 24 hours"</em>, <em>"Immediate action required"</em>, or <em>"Strictly confidential, do not call"</em> are engineered to create panic and bypass rational checks.
+            </p>
+          </div>
+
+          <div class="card" style="border-left: 4px solid var(--warning);">
+            <h4 style="color: #fbbf24; margin-bottom: 8px;">💳 2. Financial Changes & Wire Transfer Requests</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+              Any email asking to update vendor banking details, switch routing numbers, or purchase gift cards should be flagged immediately. Always verify independently through a secondary verified communication channel.
+            </p>
+          </div>
+
+          <div class="card" style="border-left: 4px solid var(--accent);">
+            <h4 style="color: #38bdf8; margin-bottom: 8px;">🔗 3. Suspicious Links & Spoofed Domains</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+              Hover before clicking! Attackers create deceptive lookalike domains (e.g., <code>micros0ft.com</code> or raw IP links like <code>http://192.168.1.50/login</code>) to steal your username and password.
+            </p>
+          </div>
+
+          <div class="card" style="border-left: 4px solid #a78bfa;">
+            <h4 style="color: #a78bfa; margin-bottom: 8px;">📎 4. High-Risk Attachment Extensions</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+              Never open attachments ending in <code>.exe</code>, <code>.scr</code>, <code>.vbs</code>, <code>.bat</code>, or double extensions like <code>Document.pdf.exe</code>. Avoid enabling macros in unknown Office files.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      requireAuth("Viewer");
+    });
+  </script>
+</body>
+</html>
+

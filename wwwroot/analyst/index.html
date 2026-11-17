@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmailShield — Submit & Analyze Email</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/jpeg" href="../images/logo.jpg">
+  <script src="../js/auth.js"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- SECURITY ANALYST SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="../images/logo.jpg" alt="EmailShield Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <h1>EmailShield</h1>
+          <p>Security Hub</p>
+        </div>
+      </div>
+
+      <div class="sidebar-nav-title">Threat Intelligence</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <a href="/analyst/index.html" class="sidebar-link active">
+            <span class="icon">🔍</span>
+            <span>Submit & Analyze</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/analyst/report.html" class="sidebar-link">
+            <span class="icon">🔬</span>
+            <span>Forensics Findings</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/analyst/history.html" class="sidebar-link">
+            <span class="icon">📜</span>
+            <span>Analysis History</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-secondary" style="width: 100%; gap: 10px;" onclick="confirmSignOut()">
+          <span>🚪</span> Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <header class="top-bar">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700;">Submit Suspicious Email</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Upload .eml files or paste raw headers for deep forensic analysis</p>
+        </div>
+        <div class="user-badge">
+          <span id="navUserName">Analyst</span>
+          <span id="navUserRole" class="role-tag role-analyst">SECURITY ANALYST</span>
+        </div>
+      </header>
+
+      <div class="container" style="padding-top: 1.5rem;">
+        <div id="globalAlert" class="alert" style="display: none;"></div>
+
+        <!-- Submission Box -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <div class="card-title">
+            <span>Threat Inspection Intake</span>
+            <button class="btn btn-secondary btn-sm" onclick="loadSamplePhishingEmail()">
+              🧪 Load Sample BEC Attack
+            </button>
+          </div>
+
+          <div class="tabs">
+            <button id="analystTabBtnUpload" class="tab-btn active" onclick="switchSubmissionMode('upload')">Upload .EML File</button>
+            <button id="analystTabBtnPaste" class="tab-btn" onclick="switchSubmissionMode('paste')">Paste Email Headers & Text</button>
+          </div>
+
+          <!-- Mode 1: Upload EML -->
+          <div id="subModeUpload">
+            <div class="dropzone" id="dropzoneEml" onclick="document.getElementById('fileEmlInput').click()">
+              <div class="dropzone-icon">📁</div>
+              <p><strong>Click to choose a .eml file</strong> or drag and drop here</p>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">Supported format: Standard RFC822 (.eml) export from Outlook, Gmail, or Thunderbird</p>
+              <input type="file" id="fileEmlInput" accept=".eml" style="display: none;" onchange="handleFileSelected(event)">
+            </div>
+            <div id="fileSelectedName" style="margin-top: 10px; font-weight: 600; color: var(--accent); display: none;"></div>
+            <button id="btnSubmitEml" class="btn btn-primary" style="margin-top: 1rem; width: 100%;" onclick="submitEmlFile()" disabled>
+              Analyze .EML File
+            </button>
+          </div>
+
+          <!-- Mode 2: Paste Raw Text -->
+          <div id="subModePaste" style="display: none;">
+            <div class="form-group">
+              <label for="textEmailContent">Raw Email Content (Headers + Message Body)</label>
+              <textarea id="textEmailContent" class="form-control" rows="8" placeholder="From: ceo@company-internal.xyz&#10;To: finance@school.edu&#10;Subject: URGENT: Wire Transfer Update&#10;&#10;Please process the attached payment immediately..."></textarea>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="submitRawText()">
+              Run Forensic Threat Analysis
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Recent History -->
+        <div class="card">
+          <div class="card-title">
+            <span>Recent Inspections</span>
+            <a href="/analyst/history.html" class="btn btn-secondary btn-sm">View Full History →</a>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Subject</th>
+                  <th>Sender</th>
+                  <th>Submitted By</th>
+                  <th>Risk Score</th>
+                  <th>Classification</th>
+                  <th>Analyzed Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="tableAnalystHistoryBody">
+                <tr><td colspan="7" style="text-align: center;">Loading history...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div class="pagination-bar" id="analystPagination" style="display: flex; align-items: center; justify-content: space-between; margin-top: 1.25rem; flex-wrap: wrap; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <div style="font-size: 0.85rem; color: var(--text-muted);" id="analystPaginationInfo">
+              Showing 0 to 0 of 0 records
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label for="analystPageSize" style="font-size: 0.85rem; color: var(--text-muted);">Rows per page:</label>
+              <select id="analystPageSize" class="form-control" style="width: auto; padding: 4px 10px; font-size: 0.85rem; height: auto;" onchange="changeAnalystPageSize(this.value)">
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+              <button id="btnAnalystPrev" class="btn btn-secondary btn-sm" onclick="prevAnalystPage()" disabled>Previous</button>
+              <span id="analystPageNumber" style="font-size: 0.85rem; font-weight: 600; padding: 0 6px;">Page 1 of 1</span>
+              <button id="btnAnalystNext" class="btn btn-secondary btn-sm" onclick="nextAnalystPage()" disabled>Next</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/analyst.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const user = requireAuth("Security Analyst");
+      if (user) {
+        setupDropzone();
+        loadAnalystHistory();
+      }
+    });
+  </script>
+</body>
+</html>
+

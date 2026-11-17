@@ -1,0 +1,23 @@
+## Build and output directories
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Visual Studio / IDE files
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+## Temporary files
+*.tmp
+*.bak
+*~

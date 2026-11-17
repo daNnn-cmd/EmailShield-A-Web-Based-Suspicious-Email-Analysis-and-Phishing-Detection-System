@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmailShield — Sign In</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/jpeg" href="images/logo.jpg">
+</head>
+<body style="min-height: 100vh; display: flex; flex-direction: column;">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/" class="brand">
+      <img src="images/logo.jpg" alt="EmailShield Logo" class="brand-logo-img">
+      <div class="brand-text">
+        <h1>EmailShield</h1>
+        <p>Analyze • Detect • Protect</p>
+      </div>
+    </a>
+  </nav>
+
+  <!-- Login / Register Card Container -->
+  <div class="container" style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 2rem 1rem;">
+    <!-- Notification Alert -->
+    <div id="globalAlert" class="alert" style="display: none; max-width: 460px; margin: 0 auto 1.25rem;"></div>
+
+    <div class="view-header" style="text-align: center; max-width: 600px; margin: 0 auto 1.5rem;">
+      <h2>EmailShield Security Portal</h2>
+      <p>A web-based suspicious email analysis and phishing detection system for schools and organizations.</p>
+    </div>
+
+    <!-- Auth Form Card -->
+    <div class="card" style="max-width: 440px; margin: 0 auto; width: 100%;">
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.35rem;">Sign In to Portal</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Enter your authorized organizational credentials</p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="formLogin" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="loginEmail">Email Address</label>
+          <input type="email" id="loginEmail" class="form-control" placeholder="user@school.edu" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.75rem;">
+          Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>EmailShield: A Web-Based Suspicious Email Analysis and Phishing Detection System</p>
+    <p style="margin-top: 4px; font-size: 0.75rem;">Developed for System Administration and Maintenance (IT23/L) • SQL Server SSMS Integration</p>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const user = getCurrentUser();
+      if (user) {
+        redirectByRole(user.roleName);
+      }
+    });
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          showAlert(err.message || "Failed to sign in. Please verify credentials.", "danger");
+          return;
+        }
+
+        const user = await res.json();
+        // Use tab-isolated sessionStorage so copying URLs to a new tab forces login
+        sessionStorage.setItem("emailshield_user", JSON.stringify(user));
+        try {
+          localStorage.removeItem("emailshield_user");
+        } catch {}
+        redirectByRole(user.roleName);
+      } catch {
+        showAlert("Error connecting to backend API.", "danger");
+      }
+    }
+  </script>
+</body>
+</html>

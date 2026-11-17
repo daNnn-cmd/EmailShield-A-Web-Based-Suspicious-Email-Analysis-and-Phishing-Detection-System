@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmailShield — Email Safety Verification</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/jpeg" href="../images/logo.jpg">
+  <script src="../js/auth.js"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- VIEWER SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="../images/logo.jpg" alt="EmailShield Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <h1>EmailShield</h1>
+          <p>Security Hub</p>
+        </div>
+      </div>
+
+      <div class="sidebar-nav-title">Email Security</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <a href="/viewer/index.html" class="sidebar-link active">
+            <span class="icon">🛡️</span>
+            <span>Check Suspicious Email</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/viewer/history.html" class="sidebar-link">
+            <span class="icon">📋</span>
+            <span>My Past Submissions</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/viewer/tips.html" class="sidebar-link">
+            <span class="icon">💡</span>
+            <span>Phishing Red Flags</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-secondary" style="width: 100%; gap: 10px;" onclick="confirmSignOut()">
+          <span>🚪</span> Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <header class="top-bar">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700;">Email Safety Verification</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Paste any suspicious email to verify its legitimacy</p>
+        </div>
+        <div class="user-badge">
+          <span id="navUserName">User</span>
+          <span id="navUserRole" class="role-tag role-viewer">VIEWER / USER</span>
+        </div>
+      </header>
+
+      <div class="container" style="padding-top: 1.5rem;">
+        <div id="globalAlert" class="alert" style="display: none;"></div>
+
+        <div class="view-header">
+          <h2>Email Safety Checker</h2>
+          <p>Verify whether an email is safe or dangerous before clicking links or downloading attachments.</p>
+        </div>
+
+        <div class="grid grid-cols-2" style="margin-bottom: 2rem;">
+          <!-- Dual Submission Options -->
+          <div class="card">
+            <div class="card-title">
+              <span>Inspect an Email</span>
+            </div>
+
+            <div class="tabs" style="margin-bottom: 1rem;">
+              <button id="viewerTabBtnText" class="tab-btn active" onclick="switchViewerInputTab('text')">✍️ Paste Email Text</button>
+              <button id="viewerTabBtnFile" class="tab-btn" onclick="switchViewerInputTab('file')">📁 Upload .EML File</button>
+            </div>
+
+            <!-- Text Input Tab -->
+            <div id="viewerInputTextSection">
+              <div class="form-group">
+                <label for="viewerEmailContent">Paste the Email text, headers, or message body:</label>
+                <textarea id="viewerEmailContent" class="form-control" rows="8" placeholder="Paste the suspicious email text here..."></textarea>
+              </div>
+              <button class="btn btn-primary" style="width: 100%;" onclick="submitViewerText()">
+                Scan Email Text Now
+              </button>
+            </div>
+
+            <!-- File Upload Tab -->
+            <div id="viewerInputFileSection" style="display: none;">
+              <div class="form-group">
+                <label for="viewerFileInput">Select an exported .eml message file:</label>
+                <input type="file" id="viewerFileInput" class="form-control" accept=".eml" onchange="onViewerFileSelected(this)">
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+                Supported format: RFC822 (.eml) exported from Outlook, Gmail, Thunderbird, or Apple Mail.
+              </p>
+              <button class="btn btn-primary" style="width: 100%;" onclick="submitViewerEmlFile()">
+                Upload & Inspect .EML File
+              </button>
+            </div>
+          </div>
+
+          <!-- Instant Result / Security Advice -->
+          <div class="card" id="viewerResultCard" style="display: flex; flex-direction: column; justify-content: center; text-align: center;">
+            <div style="font-size: 50px; margin-bottom: 10px;">🛡️</div>
+            <h3>Ready to Scan</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px;">
+              Paste an email or upload a .eml file on the left and click Scan to see safety status and risk explanation.
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick Submissions Table -->
+        <div class="card">
+          <div class="card-title">
+            <span>Recent Checks</span>
+            <a href="/viewer/history.html" class="btn btn-secondary btn-sm">View Full History →</a>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Subject</th>
+                  <th>Sender</th>
+                  <th>Risk Level</th>
+                  <th>Analyzed Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="tableViewerHistoryBody">
+                <tr><td colspan="5" style="text-align: center;">Loading your past submissions...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div class="pagination-bar" id="viewerPagination" style="display: flex; align-items: center; justify-content: space-between; margin-top: 1.25rem; flex-wrap: wrap; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <div style="font-size: 0.85rem; color: var(--text-muted);" id="viewerPaginationInfo">
+              Showing 0 to 0 of 0 submissions
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label for="viewerPageSize" style="font-size: 0.85rem; color: var(--text-muted);">Rows per page:</label>
+              <select id="viewerPageSize" class="form-control" style="width: auto; padding: 4px 10px; font-size: 0.85rem; height: auto;" onchange="changeViewerPageSize(this.value)">
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+              <button id="btnViewerPrev" class="btn btn-secondary btn-sm" onclick="prevViewerPage()" disabled>Previous</button>
+              <span id="viewerPageNumber" style="font-size: 0.85rem; font-weight: 600; padding: 0 6px;">Page 1 of 1</span>
+              <button id="btnViewerNext" class="btn btn-secondary btn-sm" onclick="nextViewerPage()" disabled>Next</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/viewer.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const user = requireAuth("Viewer");
+      if (user) {
+        loadViewerHistory();
+      }
+    });
+  </script>
+</body>
+</html>
+

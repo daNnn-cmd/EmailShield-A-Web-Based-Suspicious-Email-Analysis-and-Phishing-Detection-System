@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmailShield — Email Analysis Results</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/jpeg" href="../images/logo.jpg">
+  <script src="../js/auth.js"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- VIEWER SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="../images/logo.jpg" alt="EmailShield Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <h1>EmailShield</h1>
+          <p>Security Hub</p>
+        </div>
+      </div>
+
+      <div class="sidebar-nav-title">Email Security</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <a href="/viewer/index.html" class="sidebar-link">
+            <span class="icon">🛡️</span>
+            <span>Check Suspicious Email</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/viewer/history.html" class="sidebar-link active">
+            <span class="icon">📋</span>
+            <span>My Past Submissions</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/viewer/tips.html" class="sidebar-link">
+            <span class="icon">💡</span>
+            <span>Phishing Red Flags</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-secondary" style="width: 100%; gap: 10px;" onclick="confirmSignOut()">
+          <span>🚪</span> Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <header class="top-bar">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700;">Email Analysis Results</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Detailed explanation and safety recommendations for your submitted email</p>
+        </div>
+        <div class="user-badge">
+          <span id="navUserName">User</span>
+          <span id="navUserRole" class="role-tag role-viewer">VIEWER / USER</span>
+        </div>
+      </header>
+
+      <div class="container" style="padding-top: 1.5rem;">
+        <div id="globalAlert" class="alert" style="display: none;"></div>
+
+        <!-- Analysis Results Card -->
+        <div id="analystResultSection" class="card" style="border-color: var(--accent);">
+          <div class="card-title">
+            <span>🛡️ Email Safety Findings</span>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="/viewer/history.html" class="btn btn-secondary btn-sm">← Back to My Submissions</a>
+              <button class="btn btn-secondary btn-sm" onclick="exportCurrentReportPdf()">📄 Export PDF</button>
+              <button class="btn btn-secondary btn-sm" onclick="exportCurrentReportCsv()">📥 Export CSV</button>
+              <button class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ Print Report</button>
+            </div>
+          </div>
+
+          <!-- Score & Classification Banner -->
+          <div id="resultScoreBox" class="score-box score-high">
+            <div id="resultScoreCircle" class="score-circle">--</div>
+            <div>
+              <h3 id="resultClassification" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 4px;">ANALYZING...</h3>
+              <p id="resultSummary" style="font-size: 0.95rem;">Retrieving scan explanation...</p>
+            </div>
+          </div>
+
+          <!-- Meta info -->
+          <div class="grid grid-cols-2" style="margin-bottom: 1.5rem;">
+            <div>
+              <p><strong>Subject:</strong> <span id="resSubject">-</span></p>
+              <p><strong>From:</strong> <span id="resFrom">-</span></p>
+              <p><strong>To:</strong> <span id="resTo">-</span></p>
+            </div>
+            <div>
+              <p><strong>Submission Type:</strong> <span id="resType">-</span></p>
+              <p><strong>Submitted By:</strong> <span id="resUser">-</span></p>
+              <p><strong>Analyzed Date:</strong> <span id="resDate">-</span></p>
+            </div>
+          </div>
+
+          <!-- Recommendations Box -->
+          <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+            <h4 style="margin-bottom: 6px;">🛡️ Recommended Mitigation Actions:</h4>
+            <p id="resRecommendations" style="white-space: pre-line;">-</p>
+          </div>
+
+          <!-- Detailed Findings Tabs -->
+          <div class="tabs">
+            <button class="tab-btn active" onclick="switchResultTab('threats')">Threat Indicators (<span id="countThreats">0</span>)</button>
+            <button class="tab-btn" onclick="switchResultTab('auth')">Authentication (SPF/DKIM/DMARC)</button>
+            <button class="tab-btn" onclick="switchResultTab('urls')">Extracted URLs (<span id="countUrls">0</span>)</button>
+            <button class="tab-btn" onclick="switchResultTab('attachments')">Attachments (<span id="countAttachments">0</span>)</button>
+          </div>
+
+          <!-- Threats Tab -->
+          <div id="resTabThreats">
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Severity</th>
+                    <th>Indicator Type</th>
+                    <th>Points</th>
+                    <th>Explanation</th>
+                  </tr>
+                </thead>
+                <tbody id="tableThreatsBody">
+                  <tr><td colspan="4" style="text-align: center;">No threat data loaded.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Authentication Tab -->
+          <div id="resTabAuth" style="display: none;">
+            <div class="grid grid-cols-3" style="margin-bottom: 1rem;">
+              <div class="card" style="text-align: center;">
+                <h4>SPF</h4>
+                <p id="resSpf" style="font-size: 1.2rem; font-weight: 700; margin-top: 4px;">None</p>
+              </div>
+              <div class="card" style="text-align: center;">
+                <h4>DKIM</h4>
+                <p id="resDkim" style="font-size: 1.2rem; font-weight: 700; margin-top: 4px;">None</p>
+              </div>
+              <div class="card" style="text-align: center;">
+                <h4>DMARC</h4>
+                <p id="resDmarc" style="font-size: 1.2rem; font-weight: 700; margin-top: 4px;">None</p>
+              </div>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+              <strong>Raw Auth Header:</strong> <span id="resAuthHeader" style="font-family: monospace;">-</span>
+            </p>
+          </div>
+
+          <!-- URLs Tab -->
+          <div id="resTabUrls" style="display: none;">
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Extracted URL</th>
+                    <th>Domain</th>
+                    <th>Reputation</th>
+                    <th>Suspicious</th>
+                    <th>Detection Reason</th>
+                  </tr>
+                </thead>
+                <tbody id="tableUrlsBody">
+                  <tr><td colspan="5" style="text-align: center;">No links extracted.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Attachments Tab -->
+          <div id="resTabAttachments" style="display: none;">
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Filename</th>
+                    <th>Extension</th>
+                    <th>MIME Type</th>
+                    <th>Size</th>
+                    <th>Suspicious</th>
+                    <th>Detection Reason</th>
+                  </tr>
+                </thead>
+                <tbody id="tableAttachmentsBody">
+                  <tr><td colspan="6" style="text-align: center;">No attachments detected.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/report.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const user = requireAuth("Viewer");
+      if (!user) return;
+      await initReportPage();
+    });
+  </script>
+</body>
+</html>
+

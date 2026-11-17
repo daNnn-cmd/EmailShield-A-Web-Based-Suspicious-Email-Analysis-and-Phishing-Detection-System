@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmailShield — User Accounts</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/jpeg" href="../images/logo.jpg">
+  <script src="../js/auth.js"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- ADMINISTRATOR SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="../images/logo.jpg" alt="EmailShield Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <h1>EmailShield</h1>
+          <p>Security Hub</p>
+        </div>
+      </div>
+
+      <div class="sidebar-nav-title">Administration</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <a href="/admin/index.html" class="sidebar-link">
+            <span class="icon">📊</span>
+            <span>Admin Dashboard</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/users.html" class="sidebar-link active">
+            <span class="icon">👥</span>
+            <span>User Accounts</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/audits.html" class="sidebar-link">
+            <span class="icon">📝</span>
+            <span>Security Audit Logs</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/scans.html" class="sidebar-link">
+            <span class="icon">🗄️</span>
+            <span>Global Scan Archive</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/settings.html" class="sidebar-link">
+            <span class="icon">⚙️</span>
+            <span>Rules & Settings</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-secondary" style="width: 100%; gap: 10px;" onclick="confirmSignOut()">
+          <span>🚪</span> Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <header class="top-bar">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700;">User Accounts Management</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Configure user permissions, roles, and access status</p>
+        </div>
+        <div class="user-badge">
+          <span id="navUserName">Admin</span>
+          <span id="navUserRole" class="role-tag role-admin">ADMINISTRATOR</span>
+        </div>
+      </header>
+
+      <div class="container" style="padding-top: 1.5rem;">
+        <div id="globalAlert" class="alert" style="display: none;"></div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>👥 System User Directory</span>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-primary btn-sm" onclick="openAddUserModal()">➕ Add New User</button>
+              <button class="btn btn-secondary btn-sm" onclick="loadAdminUsers()">🔄 Refresh Users</button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Full Name</th>
+                  <th>Email Address</th>
+                  <th>Assigned Role</th>
+                  <th>Account Status</th>
+                  <th>Date Registered</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="tableUsersBody">
+                <tr><td colspan="6" style="text-align: center;">Loading users...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div class="pagination-bar" id="usersPagination" style="display: flex; align-items: center; justify-content: space-between; margin-top: 1.25rem; flex-wrap: wrap; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <div style="font-size: 0.85rem; color: var(--text-muted);" id="usersPaginationInfo">
+              Showing 0 to 0 of 0 users
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label for="usersPageSize" style="font-size: 0.85rem; color: var(--text-muted);">Rows per page:</label>
+              <select id="usersPageSize" class="form-control" style="width: auto; padding: 4px 10px; font-size: 0.85rem; height: auto;" onchange="changeUsersPageSize(this.value)">
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+              <button id="btnUsersPrev" class="btn btn-secondary btn-sm" onclick="prevUsersPage()" disabled>Previous</button>
+              <span id="usersPageNumber" style="font-size: 0.85rem; font-weight: 600; padding: 0 6px;">Page 1 of 1</span>
+              <button id="btnUsersNext" class="btn btn-secondary btn-sm" onclick="nextUsersPage()" disabled>Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal: Add New User -->
+      <div id="modalAddUser" class="modal-overlay" style="display: none;" onclick="if(event.target===this) closeAddUserModal()">
+        <div class="modal-box modal-box-form">
+          <div class="modal-header">
+            <h3>➕ Add New User Account</h3>
+            <button type="button" class="modal-close-btn" onclick="closeAddUserModal()">✕</button>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+            Create a new user account with designated role credentials and system privileges.
+          </p>
+          <form id="formAddUser" onsubmit="submitAddUser(event)">
+            <div class="form-group">
+              <label for="addFullName">Full Name</label>
+              <input type="text" id="addFullName" class="form-control" placeholder="e.g. Daniel Pelpinosas" required>
+            </div>
+            <div class="form-group">
+              <label for="addEmail">Email Address</label>
+              <input type="email" id="addEmail" class="form-control" placeholder="e.g. daniel@emailshield.local" required>
+            </div>
+            <div class="form-group">
+              <label for="addPassword">Initial Password</label>
+              <input type="password" id="addPassword" class="form-control" placeholder="Create strong password" required>
+            </div>
+            <div class="form-group">
+              <label for="addRoleId">Assigned Role</label>
+              <select id="addRoleId" class="form-control" required>
+                <option value="3" selected>Viewer / User (Submit & View)</option>
+                <option value="2">Security Analyst (Analyze & Inspect)</option>
+                <option value="1">Administrator (System Control)</option>
+              </select>
+            </div>
+            <div class="modal-actions" style="margin-top: 1.5rem;">
+              <button type="button" class="btn btn-secondary" onclick="closeAddUserModal()">Cancel</button>
+              <button type="submit" class="btn btn-primary" id="btnAddUserSubmit">Create Account</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal: Edit User Account -->
+      <div id="modalEditUser" class="modal-overlay" style="display: none;" onclick="if(event.target===this) closeEditUserModal()">
+        <div class="modal-box modal-box-form">
+          <div class="modal-header">
+            <h3>✏️ Edit User Account</h3>
+            <button type="button" class="modal-close-btn" onclick="closeEditUserModal()">✕</button>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+            Update user information, assigned role permissions, or reset access password.
+          </p>
+          <form id="formEditUser" onsubmit="submitEditUser(event)">
+            <input type="hidden" id="editUserId">
+            <div class="form-group">
+              <label for="editFullName">Full Name</label>
+              <input type="text" id="editFullName" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="editEmail">Email Address</label>
+              <input type="email" id="editEmail" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="editRoleId">Assigned Role</label>
+              <select id="editRoleId" class="form-control" required>
+                <option value="3">Viewer / User (Submit & View)</option>
+                <option value="2">Security Analyst (Analyze & Inspect)</option>
+                <option value="1">Administrator (System Control)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="editIsActive">Account Status</label>
+              <select id="editIsActive" class="form-control" required>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="editPassword">New Password <span style="font-weight: 400; color: var(--text-muted);">(optional)</span></label>
+              <input type="password" id="editPassword" class="form-control" placeholder="Leave blank to keep current password">
+            </div>
+            <div class="modal-actions" style="margin-top: 1.5rem;">
+              <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()">Cancel</button>
+              <button type="submit" class="btn btn-primary" id="btnEditUserSubmit">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/admin.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const user = requireAuth("Administrator");
+      if (user) {
+        loadAdminUsers();
+      }
+    });
+  </script>
+</body>
+</html>
+

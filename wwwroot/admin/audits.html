@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmailShield — Security Audit Logs</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/jpeg" href="../images/logo.jpg">
+  <script src="../js/auth.js"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- ADMINISTRATOR SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="../images/logo.jpg" alt="EmailShield Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <h1>EmailShield</h1>
+          <p>Security Hub</p>
+        </div>
+      </div>
+
+      <div class="sidebar-nav-title">Administration</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <a href="/admin/index.html" class="sidebar-link">
+            <span class="icon">📊</span>
+            <span>Admin Dashboard</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/users.html" class="sidebar-link">
+            <span class="icon">👥</span>
+            <span>User Accounts</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/audits.html" class="sidebar-link active">
+            <span class="icon">📝</span>
+            <span>Security Audit Logs</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/scans.html" class="sidebar-link">
+            <span class="icon">🗄️</span>
+            <span>Global Scan Archive</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/settings.html" class="sidebar-link">
+            <span class="icon">⚙️</span>
+            <span>Rules & Settings</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-secondary" style="width: 100%; gap: 10px;" onclick="confirmSignOut()">
+          <span>🚪</span> Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <header class="top-bar">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700;">Security Audit Logs</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Immutable activity logs and system event audit trail</p>
+        </div>
+        <div class="user-badge">
+          <span id="navUserName">Admin</span>
+          <span id="navUserRole" class="role-tag role-admin">ADMINISTRATOR</span>
+        </div>
+      </header>
+
+      <div class="container" style="padding-top: 1.5rem;">
+        <div id="globalAlert" class="alert" style="display: none;"></div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>📝 Comprehensive Audit Trail (AuditLogs)</span>
+            <button class="btn btn-secondary btn-sm" onclick="loadAuditLogs()">🔄 Refresh Logs</button>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Action</th>
+                  <th>Description</th>
+                  <th>Timestamp (Philippine Time)</th>
+                </tr>
+              </thead>
+              <tbody id="tableAuditsBody">
+                <tr><td colspan="4" style="text-align: center;">Loading audit logs...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div class="pagination-bar" id="auditPagination" style="display: flex; align-items: center; justify-content: space-between; margin-top: 1.25rem; flex-wrap: wrap; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <div style="font-size: 0.85rem; color: var(--text-muted);" id="auditPaginationInfo">
+              Showing 0 to 0 of 0 logs
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label for="auditPageSize" style="font-size: 0.85rem; color: var(--text-muted);">Rows per page:</label>
+              <select id="auditPageSize" class="form-control" style="width: auto; padding: 4px 10px; font-size: 0.85rem; height: auto;" onchange="changeAuditPageSize(this.value)">
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+              <button id="btnAuditPrev" class="btn btn-secondary btn-sm" onclick="prevAuditPage()" disabled>Previous</button>
+              <span id="auditPageNumber" style="font-size: 0.85rem; font-weight: 600; padding: 0 6px;">Page 1 of 1</span>
+              <button id="btnAuditNext" class="btn btn-secondary btn-sm" onclick="nextAuditPage()" disabled>Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/admin.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const user = requireAuth("Administrator");
+      if (user) {
+        loadAuditLogs();
+      }
+    });
+  </script>
+</body>
+</html>
+
