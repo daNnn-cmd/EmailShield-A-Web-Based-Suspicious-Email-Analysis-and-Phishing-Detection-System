@@ -192,7 +192,26 @@ dotnet run
 
 ---
 
+## 🌐 Dual Database & Cloud Synchronization Architecture
+
+EmailShield is designed to seamlessly operate across both local development and live cloud production environments with bi-directional database synchronization:
+
+- **Local SQL Database:** `LAPTOP-1ERS664U\SQLEXPRESS` (Database: `EmailShieldDB`)
+- **Deployed Online Database:** `db81100.public.databaseasp.net` (Database: `db81100` on MonsterASP / ASP.NET)
+
+### Key Synchronization Capabilities:
+1. **Continuous Automated Sync:** A built-in background worker (`DatabaseSyncBackgroundService`) runs periodically to verify and synchronize new records (Users, Scans, Forensic Findings, and Audit Logs) between Local and Online databases.
+2. **On-Demand Web Admin Sync:** Administrators can monitor real-time connection health, row counts, and trigger instantaneous bi-directional synchronization from **Rules & Settings (`/admin/settings.html`)**.
+3. **Standalone PowerShell Automation:** Run `Database/Sync-Databases.ps1` at any time from terminal or scheduled tasks:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File Database/Sync-Databases.ps1
+   ```
+4. **Resilient Offline Fallback:** If internet access is unavailable on the local machine, the application safely operates using the local SQL database without interruption and automatically reconciles when reconnected.
+
+---
+
 ## 📄 License & Attribution
 
 Developed by **Daniel Kent Pelpinosas** for the **EmailShield Suspicious Email Analysis and Phishing Detection System** project.  
 All rights reserved. Unauthorized reproduction or deployment without permission is prohibited.
+

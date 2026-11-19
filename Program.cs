@@ -5,11 +5,18 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+string activeTarget = builder.Configuration["DatabaseSettings:ActiveTarget"] ?? "Online";
+string connectionString = activeTarget.Equals("Local", StringComparison.OrdinalIgnoreCase)
+    ? (builder.Configuration.GetConnectionString("LocalConnection") ?? builder.Configuration.GetConnectionString("DefaultConnection")!)
+    : (builder.Configuration.GetConnectionString("OnlineConnection") ?? builder.Configuration.GetConnectionString("DefaultConnection")!);
+
 builder.Services.AddDbContext<EmailShieldDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(connectionString));
 
 builder.Services.AddSingleton<SystemSettingsService>();
 builder.Services.AddScoped<EmailAnalysisService>();
+builder.Services.AddScoped<DatabaseSyncService>();
+builder.Services.AddHostedService<DatabaseSyncBackgroundService>();
 
 builder.Services.AddControllers();
 // Configure Swagger/OpenAPI at /swagger
@@ -18,11 +25,19 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Seed default users if needed
+// Seed default users if needed (gracefully handled)
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<EmailShieldDbContext>();
-    DbInitializer.SeedDemoUsers(db);
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<EmailShieldDbContext>();
+        DbInitializer.SeedDemoUsers(db);
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogWarning("Startup database seed check skipped: {Message}", ex.Message);
+    }
 }
 
 // Configure the HTTP request pipeline.

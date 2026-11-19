@@ -244,3 +244,4 @@ IF NOT EXISTS (SELECT * FROM UserRoles WHERE RoleName = 'Security Analyst')
 IF NOT EXISTS (SELECT * FROM UserRoles WHERE RoleName = 'Viewer')
     INSERT INTO UserRoles (RoleName, Description) VALUES ('Viewer', 'Standard user submission, scanning, personal history, and security tips');
 GO
+

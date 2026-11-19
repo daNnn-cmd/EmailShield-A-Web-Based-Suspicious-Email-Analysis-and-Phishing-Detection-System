@@ -232,6 +232,76 @@
             </div>
           </div>
 
+          <!-- Multi-Environment Database Synchronization Card -->
+          <div class="card" style="margin-bottom: 1.5rem; border: 1px solid rgba(59, 130, 246, 0.35); background: linear-gradient(180deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.5) 100%);">
+            <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <span style="font-size: 1.25rem;">🌐</span>
+                <span>Database Synchronization & Multi-Environment Hub</span>
+              </div>
+              <span id="syncBadgeStatus" class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600;">
+                ⚡ Continuous Auto-Sync Active
+              </span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+              EmailShield seamlessly synchronizes your <strong>Local SQL Server (SQLEXPRESS)</strong> and the <strong>Deployed Cloud Database (databaseasp.net)</strong>. Any users, scans, forensics, and audit logs created in either environment are automatically replicated.
+            </p>
+
+            <!-- Database Status Grid -->
+            <div class="grid grid-cols-2" style="gap: 1.25rem; margin-bottom: 1.25rem;">
+              <!-- Local Database Card -->
+              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                  <span style="font-weight: 700; font-size: 0.95rem; color: #93c5fd;">💻 Local SQL Database</span>
+                  <span id="dbLocalStatusBadge" class="badge" style="background: #334155; color: #94a3b8; font-size: 0.75rem;">Checking...</span>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; line-height: 1.4;">
+                  <div><strong>Server:</strong> <span id="dbLocalServer" style="font-family: monospace; color: #cbd5e1;">LAPTOP-1ERS664U\SQLEXPRESS</span></div>
+                  <div><strong>Database:</strong> <span id="dbLocalDb" style="font-family: monospace; color: #cbd5e1;">EmailShieldDB</span></div>
+                </div>
+                <div style="display: flex; gap: 0.75rem; font-size: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 0.5rem; margin-top: 0.5rem; color: var(--text-muted);">
+                  <span>Users: <strong id="dbLocalUsersCount" style="color: #f8fafc;">-</strong></span>
+                  <span>Scans: <strong id="dbLocalScansCount" style="color: #f8fafc;">-</strong></span>
+                  <span>Audits: <strong id="dbLocalAuditsCount" style="color: #f8fafc;">-</strong></span>
+                  <span style="margin-left: auto;">Latency: <strong id="dbLocalLatency" style="color: #10b981;">-</strong></span>
+                </div>
+              </div>
+
+              <!-- Online Database Card -->
+              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                  <span style="font-weight: 700; font-size: 0.95rem; color: #a7f3d0;">☁️ Deployed Cloud Database</span>
+                  <span id="dbOnlineStatusBadge" class="badge" style="background: #334155; color: #94a3b8; font-size: 0.75rem;">Checking...</span>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; line-height: 1.4;">
+                  <div><strong>Server:</strong> <span id="dbOnlineServer" style="font-family: monospace; color: #cbd5e1;">db81100.public.databaseasp.net</span></div>
+                  <div><strong>Database:</strong> <span id="dbOnlineDb" style="font-family: monospace; color: #cbd5e1;">db81100</span></div>
+                </div>
+                <div style="display: flex; gap: 0.75rem; font-size: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 0.5rem; margin-top: 0.5rem; color: var(--text-muted);">
+                  <span>Users: <strong id="dbOnlineUsersCount" style="color: #f8fafc;">-</strong></span>
+                  <span>Scans: <strong id="dbOnlineScansCount" style="color: #f8fafc;">-</strong></span>
+                  <span>Audits: <strong id="dbOnlineAuditsCount" style="color: #f8fafc;">-</strong></span>
+                  <span style="margin-left: auto;">Latency: <strong id="dbOnlineLatency" style="color: #10b981;">-</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sync Action Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap; gap: 0.75rem;">
+              <div style="font-size: 0.8rem; color: var(--text-muted);">
+                <span id="lblLastSyncInfo">Status: Verifying synchronization...</span>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="btn btn-secondary" onclick="checkDatabaseStatus()" style="font-size: 0.85rem; padding: 6px 14px;">
+                  🔍 Refresh Status
+                </button>
+                <button type="button" id="btnTriggerSync" class="btn btn-primary" onclick="triggerDatabaseSync()" style="font-size: 0.85rem; padding: 6px 16px; background: linear-gradient(135deg, #2563eb, #3b82f6);">
+                  🔄 Sync Databases Now
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Actions -->
           <div style="display: flex; gap: 12px; justify-content: flex-end; margin-bottom: 2rem;">
             <button type="button" class="btn btn-secondary" onclick="openResetSettingsModal()">🔄 Reset to Defaults</button>
@@ -264,8 +334,93 @@
       const user = requireAuth("Administrator");
       if (user) {
         loadSystemSettings();
+        checkDatabaseStatus();
       }
     });
+
+    async function checkDatabaseStatus() {
+      try {
+        const res = await fetch("/api/database/status");
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        // Update Local
+        const local = data.local;
+        document.getElementById("dbLocalServer").textContent = local.server || "LAPTOP-1ERS664U\\SQLEXPRESS";
+        document.getElementById("dbLocalDb").textContent = local.database || "EmailShieldDB";
+        const localBadge = document.getElementById("dbLocalStatusBadge");
+        if (local.isConnected) {
+          localBadge.className = "badge";
+          localBadge.style = "background: rgba(16, 185, 129, 0.2); color: #10b981; font-size: 0.75rem; border: 1px solid rgba(16, 185, 129, 0.3);";
+          localBadge.textContent = "● Connected (Local)";
+        } else {
+          localBadge.className = "badge";
+          localBadge.style = "background: rgba(239, 68, 68, 0.2); color: #ef4444; font-size: 0.75rem; border: 1px solid rgba(239, 68, 68, 0.3);";
+          localBadge.textContent = "● Offline";
+        }
+        document.getElementById("dbLocalUsersCount").textContent = local.usersCount || "0";
+        document.getElementById("dbLocalScansCount").textContent = local.emailSamplesCount || "0";
+        document.getElementById("dbLocalAuditsCount").textContent = local.auditLogsCount || "0";
+        document.getElementById("dbLocalLatency").textContent = local.isConnected ? `${local.latencyMs}ms` : "N/A";
+
+        // Update Online
+        const online = data.online;
+        document.getElementById("dbOnlineServer").textContent = online.server || "db81100.public.databaseasp.net";
+        document.getElementById("dbOnlineDb").textContent = online.database || "db81100";
+        const onlineBadge = document.getElementById("dbOnlineStatusBadge");
+        if (online.isConnected) {
+          onlineBadge.className = "badge";
+          onlineBadge.style = "background: rgba(16, 185, 129, 0.2); color: #10b981; font-size: 0.75rem; border: 1px solid rgba(16, 185, 129, 0.3);";
+          onlineBadge.textContent = "● Connected (Live)";
+        } else {
+          onlineBadge.className = "badge";
+          onlineBadge.style = "background: rgba(239, 68, 68, 0.2); color: #ef4444; font-size: 0.75rem; border: 1px solid rgba(239, 68, 68, 0.3);";
+          onlineBadge.textContent = "● Unreachable";
+        }
+        document.getElementById("dbOnlineUsersCount").textContent = online.usersCount || "0";
+        document.getElementById("dbOnlineScansCount").textContent = online.emailSamplesCount || "0";
+        document.getElementById("dbOnlineAuditsCount").textContent = online.auditLogsCount || "0";
+        document.getElementById("dbOnlineLatency").textContent = online.isConnected ? `${online.latencyMs}ms` : "N/A";
+
+        // Sync info
+        const lastSyncEl = document.getElementById("lblLastSyncInfo");
+        if (data.lastSyncTime) {
+          const d = new Date(data.lastSyncTime);
+          lastSyncEl.textContent = `Last Synchronized: ${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
+        } else {
+          lastSyncEl.textContent = "Databases Ready • Auto-Sync Active (Every 5 mins)";
+        }
+      } catch (err) {
+        console.warn("Failed to check database sync status", err);
+      }
+    }
+
+    async function triggerDatabaseSync() {
+      const btn = document.getElementById("btnTriggerSync");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span>⏳</span> Synchronizing...`;
+      }
+      showAlert("Initiating bi-directional synchronization between Local and Cloud databases...", "info");
+
+      try {
+        const res = await fetch("/api/database/sync", { method: "POST" });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showAlert(`✅ ${data.message}`, "success");
+          await checkDatabaseStatus();
+        } else {
+          showAlert(`⚠️ ${data.message || "Synchronization encountered an issue."}`, "warning");
+        }
+      } catch (err) {
+        showAlert("Network error during database synchronization.", "danger");
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `🔄 Sync Databases Now`;
+        }
+      }
+    }
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") closeResetSettingsModal();
